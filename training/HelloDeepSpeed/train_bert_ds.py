@@ -781,21 +781,21 @@ def train(
     log_dist("Creating DeepSpeed engine", ranks=[0], level=logging.INFO)
     assert (dtype == 'fp16' or dtype == 'bf16')
     ds_config = {
-        "train_micro_batch_size_per_gpu": batch_size,
+        # "train_micro_batch_size_per_gpu": batch_size,
+        "train_batch_size": 4,
         "optimizer": {
             "type": "Adam",
             "params": {
-                "lr": 1e-4
+                "lr": 1e-4,
+                "torch_adam": True,
+                "adam_w_mode": True
             }
         },
         dtype: {
             "enabled": True
         },
         "zero_optimization": {
-            "stage": 1,
-            "offload_optimizer": {
-                "device": "cpu"
-            }
+            "stage": 3
         }
     }
     model, _, _, _ = deepspeed.initialize(model=model,
